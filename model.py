@@ -1,21 +1,9 @@
-from app import mysql
-import hashlib
+from flask_sqlalchemy import SQLAlchemy
 
-def md5(texto):
-    hash_md5 = hashlib.md5()
-    hash_md5.update(texto.encode('utf-8'))
-    return hash_md5.hexdigest()
+db = SQLAlchemy()
 
-class Usuarios:
-    def criarUsuario(self, nome, senha):
-        cursor = mysql.connection.cursor()
-        cursor.execute("INSERT INTO Usuarios (nome, senha) VALUES (%s, %s)", (nome, md5(senha)))
-        mysql.connection.commit()
-        cursor.close()
-
-    def autenticarLogin(self, nome, senha):
-        cursor = mysql.connection.cursor()
-        cursor.execute("SELECT * FROM Usuarios WHERE nome = %s AND senha = %s", (nome, md5(senha)))
-        user = cursor.fetchone()
-        cursor.close()
-        return user
+class Usuario(db.Model):
+    __tablename__ = 'usuarios'
+    id_usuario = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(60))
+    senha = db.Column(db.String(50))

@@ -1,22 +1,24 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from dotenv import load_dotenv
 import os
-from flask_mysqldb import MySQL
+import hashlib
 
-load_dotenv()
+from model import db, Usuario
 
 app = Flask(__name__)
 
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600
 
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
-app.config['MYSQL_DB'] = 'oficina_mecanica'
-
-mysql = MySQL(app) 
-
 app.secret_key = os.getenv('SECRET_KEY')
+
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:root@localhost/oficina_mecanica"
+
+db.init_app(app)
+
+def md5(texto):
+    hash_md5 = hashlib.md5()
+    hash_md5.update(texto.encode('utf-8'))
+    return hash_md5.hexdigest()
 
 @app.route("/")
 def home():
@@ -24,8 +26,7 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    from model import Usuarios 
-    usuarioModel = Usuarios()  
+    # usuarioModel = Usuarios()
 
     if(session):
         return redirect("/home")
@@ -34,10 +35,11 @@ def login():
         senha = request.form['senha']
 
         try:
-            user = usuarioModel.autenticarLogin(nome, senha)
-            print(f"usuario: {user[0]}")
+            user = Usuario.query.filter_by(nome=nome, senha=md5(senha)).first()
+            print(f"usuario: {user.id_usuario}")
             if user:
-                session['id_usuario'] = user[0]
+                print(f"usuario: {user.senha}")
+                session['id_usuario'] = user.id_usuario
                 return redirect("/home")
         except Exception as e:
             print(f"An error occurred: {str(e)}")
@@ -76,5 +78,11 @@ def mecanicosEquipes():
 def servicos():
     print(f"sessão: {session}")
     if(session):
+        if request.method == 'POST':
+            if request.form['servicos']:
+                nome = request.form['nome']
+                print(f"teste")
+
+
         return render_template('servicos.html')
     return redirect('/login')

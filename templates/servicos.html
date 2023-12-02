@@ -2,4 +2,55 @@
 
 {% block conteudo %}
 
+<div class="col">
+    <button data-bs-toggle="modal" data-bs-target="#modal">Adicionar Serviço</button>
+    <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Descrição</th>
+            <th scope="col">Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+          </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade modal-lg" id="modal" tabindex="-1" >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5">Adicionar Serviço</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="{{ url_for('servicos') }}" method="post">
+        <div class="modal-body">
+                <label for="Nome do Serviço">
+                </label>
+                <input type="text" name="nome" placeholder="Nome do Serviço" id="nome" required>
+                <label for="Descrição do Serviço">
+                </label>
+                <input type="text" name="descricao" placeholder="Descrição do Serviço" id="descricao" required>
+                <label for="Valor">
+                </label>
+                <input type="text" name="valor" placeholder="Valor" id="valor" required>
+            
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <input type="submit" value="servicos" class="btn btn-primary">
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
 {% endblock %}
