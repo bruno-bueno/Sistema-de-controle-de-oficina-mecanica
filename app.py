@@ -49,11 +49,32 @@ def homeUm():
     print(f"usuario: {session}")
     if(session):
         return render_template('index.html')
-    return render_template('login.html')
+    return redirect('/login')
 
 @app.route("/clientesVeiculos", methods=['GET', 'POST'])
 def clientesVeiculos():
     print(f"sessão: {session}")
     if(session):
         return render_template('clientesVeiculos.html')
-    return render_template('login.html')
+    return redirect('/login')
+
+@app.route("/pecas", methods=['GET', 'POST'])
+def pecas():
+    print(f"sessão: {session}")
+    if(session):
+        return render_template('pecas.html')
+    return redirect('/login')
+
+@app.route("/mecanicosEquipes", methods=['GET', 'POST'])
+def mecanicosEquipes():
+    print(f"sessão: {session}")
+    if(session):
+        return render_template('mecanicosEquipes.html')
+    return redirect('/login')
+    
+@app.route("/servicos", methods=['GET', 'POST'])
+def servicos():
+    print(f"sessão: {session}")
+    if(session):
+        return render_template('servicos.html')
+    return redirect('/login')
