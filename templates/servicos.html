@@ -3,7 +3,7 @@
 {% block conteudo %}
 
 <div class="col">
-    <button data-bs-toggle="modal" data-bs-target="#modal">Adicionar Serviço</button>
+    <button data-bs-toggle="modal" data-bs-target="#modal" class="btn btn-dark">Adicionar Serviço</button>
     <table class="table table-striped">
         <thead>
           <tr>
@@ -14,12 +14,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-          </tr>
+          {% for servico in servicos %}
+            <tr>
+              <th scope="row">{{ servico.id_servico }}</th>
+              <td>{{ servico.nome }}</td>
+              <td>{{ servico.descricao}}</td>
+              <td>{{ servico.valor }}</td>
+            </tr>
+          {% endfor %}
         </tbody>
     </table>
 </div>
@@ -32,22 +34,18 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form action="{{ url_for('servicos') }}" method="post">
-        <div class="modal-body">
-                <label for="Nome do Serviço">
-                </label>
-                <input type="text" name="nome" placeholder="Nome do Serviço" id="nome" required>
-                <label for="Descrição do Serviço">
-                </label>
-                <input type="text" name="descricao" placeholder="Descrição do Serviço" id="descricao" required>
-                <label for="Valor">
-                </label>
-                <input type="text" name="valor" placeholder="Valor" id="valor" required>
-            
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <input type="submit" value="servicos" class="btn btn-primary">
-        </div>
+          <div class="modal-body">
+            <h6>Nome do Serviço</h6>
+            <input type="text" class="form-control" name="nome" id="nome" required>
+            <h6>Descrição do Serviço</h6>
+            <input type="text" class="form-control" name="descricao"  id="descricao" required>
+            <h6>Numero</h6>
+            <input type="text" class="form-control" name="numero" id="numero" required>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <input type="submit" value="servicos" class="btn btn-primary">
+          </div>
         </form>
       </div>
     </div>

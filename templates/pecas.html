@@ -3,7 +3,7 @@
 {% block conteudo %}
 
 <div class="col">
-    <button data-bs-toggle="modal" data-bs-target="#modal">Adicionar Peça</button>
+    <button data-bs-toggle="modal" data-bs-target="#modal" class="btn btn-dark">Adicionar Peça</button>
     <table class="table table-striped">
         <thead>
           <tr>
@@ -14,12 +14,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-          </tr>
+          {% for peca in pecas %}
+            <tr>
+              <th scope="row">{{ peca.id_pecas }}</th>
+              <td>{{ peca.nome_da_peca }}</td>
+              <td>{{ peca.marca }}</td>
+              <td>{{ peca.valor }}</td>
+            </tr>
+          {% endfor %}
         </tbody>
     </table>
 </div>
@@ -31,13 +33,20 @@
         <h1 class="modal-title fs-5">Adicionar peça</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
+      <form action="{{ url_for('pecas') }}" method="post">
+        <div class="modal-body">
+          <h6>Nome da Peça</h6>
+          <input type="text" class="form-control" name="nome_da_peca" id="nome_da_peca" required>
+          <h6>Marca</h6>
+          <input type="text" class="form-control" name="marca"  id="marca" required>
+          <h6>Valor</h6>
+          <input type="text" class="form-control" name="valor" id="valor" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <input type="submit" value="pecas" class="btn btn-primary">
+        </div>
+      </form>
     </div>
   </div>
 </div>
