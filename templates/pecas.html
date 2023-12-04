@@ -3,8 +3,10 @@
 {% block conteudo %}
 
 <div class="col">
-    <button data-bs-toggle="modal" data-bs-target="#modal" class="btn btn-dark">Adicionar Peça</button>
-    <table class="table table-striped">
+  <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 86vh;">
+    <h4 style="float: left;">Peças</h4>
+    <button data-bs-toggle="modal" data-bs-target="#modal" class="btn btn-dark mb-4" style="float: right;">Adicionar Peça</button>
+    <table class="table table-striped" style="max-height: 74vh;">
         <thead>
           <tr>
             <th scope="col">#</th>
@@ -24,6 +26,8 @@
           {% endfor %}
         </tbody>
     </table>
+  </div>
+    
 </div>
 
 <div class="modal fade modal-lg" id="modal" tabindex="-1" >
@@ -36,19 +40,19 @@
       <form action="{{ url_for('pecas') }}" method="post">
         <div class="modal-body">
           <h6>Nome da Peça</h6>
-          <input type="text" class="form-control" name="nome_da_peca" id="nome_da_peca" required>
+          <input type="text" class="form-control mb-3" name="nome_da_peca" id="nome_da_peca" required>
           <h6>Marca</h6>
-          <input type="text" class="form-control" name="marca"  id="marca" required>
+          <input type="text" class="form-control mb-3" name="marca"  id="marca" required>
           <h6>Valor</h6>
-          <input type="text" class="form-control" name="valor" id="valor" required>
+          <input type="text" class="form-control mb-3" name="valor" id="valor" required>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <input type="submit" value="pecas" class="btn btn-primary">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-dark">Adicionar</button>
         </div>
       </form>
     </div>
-  </div>
+  </div> 
 </div>
 
 {% endblock %}

@@ -2,3 +2,9 @@ body{
     background-color: #E9E9E9!important;
     height: 100vh;
 }
+
+.barraLateral{
+    height: 100vh;
+    width: 3.5vw;
+    background-color: #878787;
+}

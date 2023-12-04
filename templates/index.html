@@ -2,42 +2,133 @@
 
 {% block conteudo %}
 
-<div class="col">
-    <table class="table table-striped">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Placa</th>
-            <th scope="col">Serviço</th>
-            <th scope="col">Prazo</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-          </tr>
-        </tbody>
-    </table>
-</div>
-<div class="col">
-    <button data-bs-toggle="modal" data-bs-target="#modal" class="btn btn-dark">Adicionar Ordem de Serviços</button>
+  <div class="mt-4">
+    <h3 style="float: left;" >Ordens de Serviço</h3>
+    <button data-bs-toggle="modal" data-bs-target="#modal" class="btn btn-dark" style="float: right;">Adicionar Ordem de Serviços</button>
+  </div>
+  <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 38vh;">
+      <h4 class="mb-4">Ordens de Serviços Pendentes</h4>
+      <table class="table table-striped" style="max-height: 27vh;">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Problema</th>
+              <th scope="col">Serviço</th>
+              <th scope="col">Prazo</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ordemServico in ordensServicos %}
+              {% if ordemServico.status_ordem == 0 %}
+                <tr>
+                  <th scope="row">{{ ordemServico.id_ordem_servicos }}</th>
+                  <td>{{ ordemServico.defeito }}</td>
+                  <td>{{ obterServico(ordemServico.id_ordem_servicos) }}</td>
+                  <td>{{ ordemServico.previsao_entrega }}</td>
+                  <td><button data-bs-toggle="modal" data-bs-target="#modalDetalhes" class="btn btn-dark" style="float: right;">Detalhes</button></td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+          </tbody>
+      </table>
+      
+  </div>
+  <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 38vh;">
+    <h4 class="mb-4">Ordens de Serviços Em andamento</h4>
+    <table class="table table-striped" style="max-height: 27vh;">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Problema</th>
+          <th scope="col">Serviço</th>
+          <th scope="col">Prazo</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ordemServico in ordensServicos %}
+          {% if ordemServico.status_ordem == 1 %}
+            <tr>
+              <th scope="row">{{ ordemServico.id_ordem_servicos }}</th>
+              <td>{{ ordemServico.defeito }}</td>
+              <td>{{ obterServico(ordemServico.id_ordem_servicos) }}</td>
+              <td>{{ ordemServico.previsao_entrega }}</td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+  </table>  
+
 </div>
 <div class="modal fade modal-lg" id="modal" tabindex="-1" >
   <div class="modal-dialog">
     <div class="modal-content">
+      <form action="{{ url_for('ordemServicos') }}" method="post">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5">Adicionar Ordem de Serviços</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <h6>Problema</h6>
+          <input type="text" class="form-control mb-3" name="defeito" id="defeito" required>
+          <h6>Data de Emissão</h6>
+          <input type="date" class="form-control mb-3" name="dataEmissao" id="dataEmissao" required>
+          <h6>Previsão de Entrega</h6>
+          <input type="date" class="form-control mb-3" name="previsaoEntrega" id="previsaoEntrega" required>
+          <h6>Escolha o Cliente</h6>
+          <select class="form-select mb-3" name="cliente" aria-label="Default select example">
+            <option selected>Adicione o cliente caso ele não exista!</option>
+            {% for cliente in clientes %}
+              <option value="{{cliente.id_clientes}}">{{cliente.nome}}</option>
+            {% endfor %}
+          </select>
+          <h6>Escolha o Veículo</h6>
+          <select class="form-select mb-3" name="veiculo" aria-label="Default select example">
+            <option selected>Adicione o cliente caso ele não exista!</option>
+            {% for veiculo in veiculos %}
+              <option value="{{veiculo.id_veiculos}}">{{veiculo.placa}}</option>
+            {% endfor %}
+          </select>
+          <h6>Escolha o Serviço</h6>
+          <select class="form-select mb-3" name="servico" aria-label="Default select example">
+            <option selected>Adicione o serviço caso ele não exista!</option>
+            {% for servico in servicos %}
+            <option value="{{servico.id_servicos}}">{{servico.nome}}</option>
+            {% endfor %}
+          </select>
+          <h6>Escolha as Peças</h6>
+          <select class="form-select mb-3" name="peca" aria-label="Default select example">
+            <option selected>Adicione a peça caso ela não exista!</option>
+            {% for pecas in pecas %}
+            <option value="{{pecas.id_pecas}}">{{pecas.nome_da_peca}}</option>
+            {% endfor %}
+          </select>
+          <h6>Escolha a Equipe</h6>
+          <select class="form-select mb-3" name="equipe" aria-label="Default select example">
+            <option selected>Adicione uma equipe caso não exista!</option>
+            {% for equipe in equipes %}
+            <option value="{{equipe.id_equipes}}">{{equipe.nome}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-dark">Save changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade modal-lg" id="modalDetalhes" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5">Adicionar Ordem de Serviços</h1>
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
   </div>

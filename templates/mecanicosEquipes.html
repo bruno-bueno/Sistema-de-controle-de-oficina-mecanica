@@ -2,81 +2,144 @@
 
 {% block conteudo %}
 
-<div class="col">
-    <button data-bs-toggle="modal" data-bs-target="#modalEquipe" class="btn btn-dark">Adicionar Equipes</button>
-    <table class="table table-striped">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Equipes</th>
-            <th scope="col">Especialidade</th>
-            <th scope="col">Mecânicos</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-          </tr>
-        </tbody>
+<div class="col-12">
+  <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 43vh;">
+    <h4 style="float: left;">Equipes</h4>
+    <button data-bs-toggle="modal" data-bs-target="#modalEquipe" class="btn btn-dark mb-4" style="float: right;">Adicionar Equipes</button>
+    <table class="table table-striped" style="max-height: 32vh;">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Equipe</th>
+          <th scope="col">Especialidade</th>
+          <th scope="col">Mecânicos</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for equipe in equipes %}
+        <tr>
+          <th scope="row">{{ equipe.id_equipes }}</th>
+          <td>{{ equipe.nome }}</td>
+          <td>{{ obterEspecialidadeEquipe(equipe.id_equipes) }}</td>
+          <td>{{ obterMecanico(equipe.id_equipes) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
-    <button data-bs-toggle="modal" data-bs-target="#modalMecanicos" class="btn btn-dark">Adicionar Mecânico</button>
-    <table class="table table-striped">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Nome</th>
-            <th scope="col">Endereço</th>
-            <th scope="col">Especialidade</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-          </tr>
-        </tbody>
+  </div>
+  
+  <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 40vh;">
+    <h4 style="float: left;">Mecânicos</h4>
+    <button data-bs-toggle="modal" data-bs-target="#modalMecanicos" class="btn btn-dark mb-4" style="float: right;">Adicionar Mecânico</button>
+    <table class="table table-striped" style="max-height: 32vh;">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Nome</th>
+          <th scope="col">Especialidade</th>
+          <th scope="col">Endereço</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for mecanico in mecanicos %}
+        <tr>
+          <th scope="row">{{mecanico.id_mecanicos}}</th>
+          <td>{{mecanico.nome}}</td>
+          <td>{{ obterEspecialidadeMecanico(mecanico.id_mecanicos) }}</td>
+          <td>{{ obterEndereco(mecanico.id_endereco) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
+  </div>
+  
 </div>
 
-<div class="modal fade modal-lg" id="modalEquipe" tabindex="-1" >
+<div class="modal fade modal-lg" id="modalEquipe" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5">Adicionar Equipes</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
+      <form action="{{ url_for('equipes') }} " method="post">
+        <div class="modal-body">
+          <h6>Nome da Equipe</h6>
+          <input type="text" class="form-control mb-3" name="nome" id="nome" required>
+          <h6>Selecione a Especialidade</h6>
+          <select class="form-select mb-3" name="servico" aria-label="Default select example">
+            <option selected>Abra Este Menu</option>
+            {% for servico in servicos %}
+            <option value="{{servico.id_servicos}}">{{servico.nome}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-dark">Adicionar</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
-<div class="modal fade modal-lg" id="modalMecanicos" tabindex="-1" >
+<div class="modal fade modal-lg" id="modalMecanicos" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5">Adicionar Mecânicos</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
+      <form action="{{ url_for('mecanicos') }}" method="post">
+        <div class="modal-body">
+          <h6>Nome do Mecânico</h6>
+          <input type="text" class="form-control mb-3" name="nome" id="nome" required>
+          <h6>CEP</h6>
+          <input type="text" class="form-control mb-3" name="cep" id="cep" required>
+          <h6>Rua</h6>
+          <input type="text" class="form-control mb-3" name="rua" id="rua" required>
+          <h6>Bairro</h6>
+          <input type="text" class="form-control mb-3" name="bairro" id="bairro" required>
+          <h6>Numero</h6>
+          <input type="text" class="form-control mb-3" name="numero" id="numero" required>
+          <h6>Selecione a Especialidade</h6>
+          <select class="form-select mb-3" name="servico" aria-label="Default select example">
+            <option selected>Caso não existam serviços adicione um</option>
+            {% for servico in servicos %}
+            <option value="{{servico.id_servicos}}">{{servico.nome}}</option>
+            {% endfor %}
+          </select>
+          <h6>Selecione a Equipe</h6>
+          <select class="form-select mb-3" name="equipe" aria-label="Default select example">
+            <option selected>Caso não existam equipes adicione uma</option>
+            {% for equipe in equipes %}
+            <option value="{{equipe.id_equipes}}">{{equipe.nome}}</option>
+            {% endfor %}
+          </select>
+        </div> 
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      <button type="submit" class="btn btn-dark">Adicionar</button>
     </div>
   </div>
+    </form>
+  </div>
 </div>
+</div>
+
+<script>
+  document.querySelector('#cep').addEventListener('blur', function () {
+        const cep = this.value;
+        fetch(`https://viacep.com.br/ws/${cep}/json/`)
+          .then((response) => response.json())
+          .then((data) => {
+            document.querySelector('input[name="bairro"]').value = data.bairro;
+            document.querySelector('input[name="rua"]').value = data.logradouro;
+          })
+          .catch((error) => {
+            console.error('Erro ao buscar o endereço:', error);
+          });
+      });
+</script>
 
 {% endblock %}

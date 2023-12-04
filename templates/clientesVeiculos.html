@@ -3,8 +3,10 @@
 {% block conteudo %}
 
 <div class="col">
-    <button data-bs-toggle="modal" data-bs-target="#modalClientes" class="btn btn-dark">Adicionar Cliente</button>
-    <table class="table table-striped">
+  <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 43vh;">
+    <h4 style="float: left;">Clientes</h4>
+    <button data-bs-toggle="modal" data-bs-target="#modalClientes" class="btn btn-dark mb-4" style="float: right;">Adicionar Cliente</button>
+    <table class="table table-striped" style="max-height: 32vh;">
         <thead>
           <tr>
             <th scope="col">#</th>
@@ -17,35 +19,39 @@
             <tr>
               <th scope="row">{{ cliente.id_clientes }}</th>
               <td>{{ cliente.nome }}</td>
-          {% endfor %}
-          {% for endereco in enderecos %}
-              <td>{{ endereco.rua }}</td>
+              <td>{{ obterEndereco(cliente.id_endereco) }}</td>
             </tr>
           {% endfor %}
 
         </tbody>
     </table>
-    <button data-bs-toggle="modal" data-bs-target="#modalCarros" class="btn btn-dark">Adicionar Carro</button>
-    <table class="table table-striped">
+  </div>
+  
+  <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 43vh;">
+    <h4 style="float: left;">Veículos</h4>
+    <button data-bs-toggle="modal" data-bs-target="#modalCarros" class="btn btn-dark mb-4" style="float: right;">Adicionar Carro</button>
+    <table class="table table-striped" style="max-height: 32vh;">
         <thead>
           <tr>
             <th scope="col">#</th>
             <th scope="col">Placa</th>
             <th scope="col">Carro</th>
-            <th scope="col">Cor</th>
-            <th scope="col">Ano</th>
             <th scope="col">Dono</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-          </tr>
+          {% for veiculo in veiculos %}
+            <tr>
+              <th scope="row">{{ veiculo.id_veiculos }}</th>
+              <td>{{veiculo.placa}}</td>
+              <td>{{veiculo.modelo}}</td>
+              <td>{{ obterCliente(veiculo.id_cliente) }}</td>
+            </tr>
+          {% endfor %}
         </tbody>
     </table>
+  </div>
+    
 </div>
 
 <div class="modal fade modal-lg" id="modalClientes" tabindex="-1" >
@@ -58,19 +64,19 @@
       <form action="{{ url_for('clientes') }}" method="post">
         <div class="modal-body">
           <h6>Nome do Cliente</h6>
-          <input type="text" class="form-control" name="nome" id="nome" required>
+          <input type="text" class="form-control mb-3" name="nome" id="nome" required>
           <h6>CEP</h6>
-          <input type="text" class="form-control" name="cep"  id="cep" required>
+          <input type="text" class="form-control mb-3" name="cep"  id="cep" required>
           <h6>Rua</h6>
-          <input type="text" class="form-control" name="rua" id="rua" required>
+          <input type="text" class="form-control mb-3" name="rua" id="rua" required>
           <h6>Bairro</h6>
-          <input type="text" class="form-control" name="bairro" id="bairro" required>
+          <input type="text" class="form-control mb-3" name="bairro" id="bairro" required>
           <h6>Numero</h6>
-          <input type="text" class="form-control" name="numero" id="numero" required>
+          <input type="text" class="form-control mb-3" name="numero" id="numero" required>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <input type="submit" value="clientes" class="btn btn-primary">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-dark">Adicionar</button>
         </div>
       </form>
     </div>
@@ -84,13 +90,31 @@
         <h1 class="modal-title fs-5">Adicionar Carro</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <form action="{{ url_for('veiculos') }}" method="post">
       <div class="modal-body">
-        
+        <h6>Placa do Carro</h6>
+        <input type="text" class="form-control mb-3" name="placa" id="placa" required>
+        <h6>Marca</h6>
+        <input type="text" class="form-control mb-3" name="marca" id="marca" required>
+        <h6>Modelo</h6>
+        <input type="text" class="form-control mb-3" name="modelo" id="modelo" required>
+        <h6>Ano</h6>
+        <input type="text" class="form-control mb-3" name="ano" id="ano" required>
+        <h6>Cor</h6>
+        <input type="text" class="form-control mb-3" name="cor" id="cor" required>
+        <h6>Dono do Veículo</h6>
+        <select class="form-select mb-3" name="cliente" aria-label="Default select example">
+          <option selected>Abra Este Menu</option>
+          {% for cliente in clientes %}
+            <option value="{{cliente.id_clientes}}">{{cliente.nome}}</option>
+          {% endfor %}
+        </select>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-dark">Adicionar</button>
       </div>
+    </form>
     </div>
   </div>
 </div>
