@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<div class="mt-4 p-4 bg-light rounded-4">
+    <h3 style="float: left;" >Usuarios</h3>
+    <button data-bs-toggle="modal" data-bs-target="#modal" class="btn btn-dark" style="float: right;">Adicionar Novo Usuario</button>
+    
+    {% for usuario in usuarios %}
+        <div style="margin-top: 5rem;">
+            <svg style="float: left;" xmlns="http://www.w3.org/2000/svg" width="6vw" height="6vw" fill="currentColor" class="bi bi-person-circle " viewBox="0 0 16 16">
+                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+            </svg>
+            <h3>{{usuario.nome}}</h3>    
+        </div>
+        <br>
+    {% endfor %}
+</div>
+
+<div class="modal fade modal-lg" id="modal" tabindex="-1" >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="{{ url_for('addUsuarios') }}" method="post">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5">Adicionar Ordem de Serviços</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <h6>Nome</h6>
+            <input type="text" class="form-control mb-3" name="nome" id="nome" required>
+            <h6>Senha</h6>
+            <input type="password" class="form-control mb-3" name="senha" id="senha" required>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-dark">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

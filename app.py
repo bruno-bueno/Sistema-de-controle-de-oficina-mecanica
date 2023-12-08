@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from dotenv import load_dotenv
 import os
 import hashlib
 
@@ -11,7 +10,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = 3600
 
 app.secret_key = os.getenv('SECRET_KEY')
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:root@localhost/oficina_mecanica"
+app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql://doadmin:AVNS_OvgSkSeBx7y7gC59WDy@db-mysql-nyc3-96783-do-user-15310791-0.c.db.ondigitalocean.com:25060/oficina_mecanica'
 
 db.init_app(app)
 
@@ -22,12 +21,12 @@ def md5(texto):
 
 @app.route("/")
 def home():
-    return "Hello, World!"
+    if(session):
+        return redirect('/home')
+    return redirect('/login')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # usuarioModel = Usuarios()
-
     if(session):
         return redirect("/home")
     if request.method == 'POST':
@@ -36,9 +35,9 @@ def login():
 
         try:
             user = Usuario.query.filter_by(nome=nome, senha=md5(senha)).first()
-            print(f"usuario: {user.id_usuario}")
+            print("usuario: {user.id_usuario}")
             if user:
-                print(f"usuario: {user.senha}")
+                print( "usuario: {user.senha}")
                 session['id_usuario'] = user.id_usuario
                 return redirect("/home")
         except Exception as e:
@@ -70,8 +69,9 @@ def ordemServicos():
         servico = int(request.form['servico'])
         peca = int(request.form['peca'])
         equipe = int(request.form['equipe'])
+        valor = float(request.form['valor'])
 
-        ordemServico = OrdemServico(defeito = defeito, data_emissao = dataEmissao, previsao_entrega = previsaoEntrega, status_ordem = 0, id_cliente = cliente, id_equipes = equipe, id_veiculo = veiculo)
+        ordemServico = OrdemServico(defeito = defeito, data_emissao = dataEmissao, previsao_entrega = previsaoEntrega, status_ordem = 0, id_cliente = cliente, id_equipes = equipe, id_veiculo = veiculo, valor_cobrado = valor)
         db.session.add(ordemServico)
         db.session.commit()
 
@@ -242,6 +242,61 @@ def servicos():
         return render_template('servicos.html', servicos = servicos)
     return redirect('/login')
 
+@app.route("/usuarios", methods=['GET'])
+def usuarios():
+    print(f"usuario: {session}")
+    if(session):
+        print(f"usuario2: {session.get('id_usuario')}")
+        usuarios = Usuario.query.all()
+        return render_template('usuarios.html', usuarios = usuarios)
+    return redirect('/login')
+
+@app.route("/addUsuarios", methods=['POST'])
+def addUsuarios():
+    print(f"usuario: {session}")
+    if(session):
+        if request.method == 'POST':
+            nome = request.form['nome']
+            senha = request.form['senha']
+
+            usuario = Usuario(nome=nome, senha=senha)
+            db.session.add(usuario)
+            db.session.commit()
+
+        return redirect('/usuarios')
+    return redirect('/login')
+
+@app.route("/metasFinalizadas", methods=['GET'])
+def metasFinalizadas():
+    print(f"usuario: {session}")
+    if(session):
+        print(f"usuario2: {session.get('id_usuario')}")
+        clientes = Cliente.query.all()
+        equipes = Equipes.query.all()
+        veiculos = Veiculo.query.all()
+        servicos = Servicos.query.all()
+        pecas = Pecas.query.all()
+        ordensServicos = OrdemServico.query.all()
+        return render_template('metasFinalizadas.html', clientes = clientes, equipes = equipes, veiculos = veiculos, servicos = servicos, pecas = pecas, ordensServicos = ordensServicos, obterServico = obterServico)
+    return redirect('/login')
+
+@app.route("/statusOrdem", methods=['POST'])
+def alterarStatus():
+    print("chegou")
+    valor = int(request.form.get('valor'))
+    id = int(request.form.get('id'))
+    ordem = OrdemServico.query.filter_by(id_ordem_servicos = id).first()
+    if ordem:
+        ordem.status_ordem = valor
+        db.session.commit()
+    return redirect('/home')
+
+@app.route("/sair", methods=['GET'])
+def sair():
+    print("veio")
+    session.clear()
+    return redirect('/login')
+
 def obterEspecialidadeEquipe(id_equipe):
     servicoId = ServicosHasEquipes.query.filter_by( equipes_id_equipes = id_equipe ).with_entities(ServicosHasEquipes.servicos_id_servicos).first()
     if servicoId is not None:
@@ -262,11 +317,10 @@ def obterEspecialidadeMecanico(id_mecanico):
             return servico.nome
     return 'Serviço não encontrado'
 
-
 def obterEndereco(id_endereco):
     endereco = Endereco.query.filter_by( id_endereco = id_endereco ).first()
     if endereco:
-        return endereco.rua
+        return endereco
     return 'Endereço não encontrado'
 
 def obterMecanico(id_equipe):
@@ -287,8 +341,8 @@ def obterServico(id_ordem_servicos):
         servico = Servicos.query.filter_by(id_servicos=servicoId[0]).first()
         if servico:
             print(servico)
-            return servico.nome
+            return servico
     return 'Serviço não encontrado'
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0')

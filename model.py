@@ -58,6 +58,7 @@ class OrdemServico(db.Model):
     data_emissao = db.Column(db.Date) 
     previsao_entrega = db.Column(db.Date) 
     status_ordem = db.Column(db.SmallInteger) 
+    valor_cobrado = db.Column(db.Float)
     id_cliente = db.Column(db.Integer, db.ForeignKey('clientes.id_clientes')) 
     id_equipes = db.Column(db.Integer, db.ForeignKey('equipes.id_equipes'))
     id_veiculo = db.Column(db.Integer, db.ForeignKey('veiculos.id_veiculos'))

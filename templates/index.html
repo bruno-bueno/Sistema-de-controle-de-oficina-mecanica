@@ -24,15 +24,40 @@
                 <tr>
                   <th scope="row">{{ ordemServico.id_ordem_servicos }}</th>
                   <td>{{ ordemServico.defeito }}</td>
-                  <td>{{ obterServico(ordemServico.id_ordem_servicos) }}</td>
+                  <td>{{ obterServico(ordemServico.id_ordem_servicos).nome }}</td>
                   <td>{{ ordemServico.previsao_entrega }}</td>
-                  <td><button data-bs-toggle="modal" data-bs-target="#modalDetalhes" class="btn btn-dark" style="float: right;">Detalhes</button></td>
+                  <td><button data-id="{{ ordemServico.id_ordem_servicos }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
                 </tr>
+                <div class="modal fade modal-lg ordem-servico-modal" id="{{ordemServico.id_ordem_servicos}}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <p class="fs-4"><b>Cod: </b>{{ ordemServico.id_ordem_servicos }}</p>
+                        <p class="fs-4"><b>Problema: </b>{{ ordemServico.defeito }}</p>
+                        <p class="fs-4"><b>Data de emissão: </b>{{ ordemServico.data_emissao }}</p>
+                        <p class="fs-4"><b>Previsão de Entrega: </b>{{ ordemServico.previsao_entrega }}</p>
+                        <p class="fs-4"><b>Serviço: </b>{{ obterServico(ordemServico.id_ordem_servicos).nome }}</p>
+                        <p class="fs-4"><b>Valor do Serviço: </b>{{ obterServico(ordemServico.id_ordem_servicos).valor }}</p>
+                        <p class="fs-4"><b>Valor Cobrado: </b>{{ ordemServico.valor_cobrado }}</p>
+                      </div>
+                      <div class="modal-footer">
+                        <form action="/statusOrdem" method="POST">
+                          <input type="hidden" name="valor" value="1">
+                          <input type="hidden" name="id" value="{{ordemServico.id_ordem_servicos}}">
+                          <button type="submit" class="btn btn-dark">Alterar para em andamento</button>                    
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               {% endif %}
             {% endfor %}
           </tbody>
-      </table>
-      
+      </table> 
   </div>
   <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 38vh;">
     <h4 class="mb-4">Ordens de Serviços Em andamento</h4>
@@ -51,9 +76,36 @@
             <tr>
               <th scope="row">{{ ordemServico.id_ordem_servicos }}</th>
               <td>{{ ordemServico.defeito }}</td>
-              <td>{{ obterServico(ordemServico.id_ordem_servicos) }}</td>
+              <td>{{ obterServico(ordemServico.id_ordem_servicos).nome }}</td>
               <td>{{ ordemServico.previsao_entrega }}</td>
+              <td><button data-id="{{ ordemServico.id_ordem_servicos }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
             </tr>
+            <div class="modal fade modal-lg ordem-servico-modal" id="{{ordemServico.id_ordem_servicos}}" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p class="fs-4"><b>Cod: </b>{{ ordemServico.id_ordem_servicos }}</p>
+                    <p class="fs-4"><b>Problema: </b>{{ ordemServico.defeito }}</p>
+                    <p class="fs-4"><b>Data de emissão: </b>{{ ordemServico.data_emissao }}</p>
+                    <p class="fs-4"><b>Previsão de Entrega: </b>{{ ordemServico.previsao_entrega }}</p>
+                    <p class="fs-4"><b>Serviço: </b>{{ obterServico(ordemServico.id_ordem_servicos).nome }}</p>
+                    <p class="fs-4"><b>Valor do Serviço: </b>{{ obterServico(ordemServico.id_ordem_servicos).valor }}</p>
+                    <p class="fs-4"><b>Valor Cobrado: </b>{{ ordemServico.valor_cobrado }}</p>
+                  </div>
+                  <div class="modal-footer">
+                    <form action="/statusOrdem" method="POST">
+                      <input type="hidden" name="valor" value="2">
+                      <input type="hidden" name="id" value="{{ordemServico.id_ordem_servicos}}">
+                      <button type="submit" class="btn btn-dark">Alterar para Concluida</button>                    
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
           {% endif %}
         {% endfor %}
       </tbody>
@@ -100,7 +152,7 @@
           <select class="form-select mb-3" name="peca" aria-label="Default select example">
             <option selected>Adicione a peça caso ela não exista!</option>
             {% for pecas in pecas %}
-            <option value="{{pecas.id_pecas}}">{{pecas.nome_da_peca}}</option>
+            <option value="{{pecas.id_pecas}}">{{pecas.nome_da_peca}} - {{pecas.marca}}</option>
             {% endfor %}
           </select>
           <h6>Escolha a Equipe</h6>
@@ -110,6 +162,8 @@
             <option value="{{equipe.id_equipes}}">{{equipe.nome}}</option>
             {% endfor %}
           </select>
+          <h6>Valor Total da Ordem</h6>
+          <input type="text" class="form-control mb-3" name="valor" id="valor" required>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -120,18 +174,28 @@
   </div>
 </div>
 
-<div class="modal fade modal-lg" id="modalDetalhes" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        
-      </div>
-    </div>
-  </div>
-</div>
+<script>
+  document.querySelectorAll('.modal-link').forEach(link => {
+      link.addEventListener('click', function() {
+          const id = this.getAttribute('data-id');
+          modalShow(id);
+      });
+  });
+
+  function modalShow(id) {
+      const modal = document.getElementById(id);
+      const bsModal = new bootstrap.Modal(modal);
+      bsModal.show();
+  }
+
+  function modalClose() {
+      document.querySelectorAll('.modal').forEach(modal => {
+          const bsModal = bootstrap.Modal.getInstance(modal);
+          if (bsModal) {
+              bsModal.hide();
+          }
+      });
+  }
+</script>
 
 {% endblock %}

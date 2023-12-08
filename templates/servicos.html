@@ -13,6 +13,7 @@
             <th scope="col">Nome</th>
             <th scope="col">Descrição</th>
             <th scope="col">Valor</th>
+            <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
@@ -22,7 +23,28 @@
               <td>{{ servico.nome }}</td>
               <td>{{ servico.descricao}}</td>
               <td>{{ servico.valor }}</td>
+              <td><button data-id="{{ servico.id_servicos }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
             </tr>
+            <div class="modal fade modal-lg ordem-servico-modal" id="{{servico.id_servicos}}" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p class="fs-4"><b>Cod: </b>{{ servico.id_servicos }}</p>
+                    <p class="fs-4"><b>Nome: </b>{{ servico.nome }}</p>
+                    <p class="fs-4"><b>Marca: </b>{{ servico.descricao }}</p>
+                    <p class="fs-4"><b>Valor: </b>R${{ servico.valor }}</p>
+                    <h3>{{ servico.id_servicos }}</h3>
+                    <h3>Nome: {{ servico.nome }}</h3>
+                    <h3>Marca: {{ servico.descricao }}</h3>
+                    <h3>Valor: R${{ servico.valor }}</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
           {% endfor %}
         </tbody>
     </table>
@@ -54,5 +76,29 @@
       </div>
     </div>
   </div>
+
+  <script>
+    document.querySelectorAll('.modal-link').forEach(link => {
+        link.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            modalShow(id);
+        });
+    });
+  
+    function modalShow(id) {
+        const modal = document.getElementById(id);
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+    }
+  
+    function modalClose() {
+        document.querySelectorAll('.modal').forEach(modal => {
+            const bsModal = bootstrap.Modal.getInstance(modal);
+            if (bsModal) {
+                bsModal.hide();
+            }
+        });
+    }
+  </script>
 
 {% endblock %}

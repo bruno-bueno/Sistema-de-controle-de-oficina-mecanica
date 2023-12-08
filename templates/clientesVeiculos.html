@@ -12,6 +12,7 @@
             <th scope="col">#</th>
             <th scope="col">Cliente</th>
             <th scope="col">Endereço</th>
+            <th scope="col" ></th>
           </tr>
         </thead>
         <tbody>
@@ -19,8 +20,27 @@
             <tr>
               <th scope="row">{{ cliente.id_clientes }}</th>
               <td>{{ cliente.nome }}</td>
-              <td>{{ obterEndereco(cliente.id_endereco) }}</td>
+              <td>{{ obterEndereco(cliente.id_endereco).rua }}</td>
+              <td><button data-id="{{ cliente.id_clientes }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
             </tr>
+            <div class="modal fade modal-lg ordem-servico-modal" id="{{cliente.id_clientes}}" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p class="fs-4"><b>Cod: </b>{{ cliente.id_clientes }}</p>
+                    <p class="fs-4"><b>Nome: </b>{{ cliente.nome }}</p>
+                    <p class="fs-4"><b>CEP: </b>{{ obterEndereco(cliente.id_endereco).cep }}</p>
+                    <p class="fs-4"><b>Rua: </b>{{ obterEndereco(cliente.id_endereco).rua }}</p>
+                    <p class="fs-4"><b>Bairro: </b>{{ obterEndereco(cliente.id_endereco).bairro }}</p>
+                    <p class="fs-4"><b>Numero: </b>{{ obterEndereco(cliente.id_endereco).numero }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           {% endfor %}
 
         </tbody>
@@ -37,6 +57,7 @@
             <th scope="col">Placa</th>
             <th scope="col">Carro</th>
             <th scope="col">Dono</th>
+            <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
@@ -46,7 +67,24 @@
               <td>{{veiculo.placa}}</td>
               <td>{{veiculo.modelo}}</td>
               <td>{{ obterCliente(veiculo.id_cliente) }}</td>
+              <td><button data-id="{{ veiculo.id_veiculos }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
             </tr>
+            <div class="modal fade modal-lg ordem-servico-modal" id="{{veiculo.id_veiculos}}" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p class="fs-4"><b>Cod: </b>{{ veiculo.id_veiculos }}</p>
+                    <p class="fs-4"><b>Placa: </b>{{ veiculo.placa }}</p>
+                    <p class="fs-4"><b>Modelo: </b>{{ veiculo.modelo }}</p>
+                    <p class="fs-4"><b>Cliente: </b>{{ obterCliente(veiculo.id_veiculos) }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           {% endfor %}
         </tbody>
     </table>
@@ -121,17 +159,39 @@
 
 <script>
   document.querySelector('#cep').addEventListener('blur', function () {
-        const cep = this.value;
-        fetch(`https://viacep.com.br/ws/${cep}/json/`)
-          .then((response) => response.json())
-          .then((data) => {
-            document.querySelector('input[name="bairro"]').value = data.bairro;
-            document.querySelector('input[name="rua"]').value = data.logradouro;
-          })
-          .catch((error) => {
-            console.error('Erro ao buscar o endereço:', error);
-          });
+    const cep = this.value;
+    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+      .then((response) => response.json())
+      .then((data) => {
+        document.querySelector('input[name="bairro"]').value = data.bairro;
+        document.querySelector('input[name="rua"]').value = data.logradouro;
+      })
+      .catch((error) => {
+        console.error('Erro ao buscar o endereço:', error);
       });
+  });
+
+  document.querySelectorAll('.modal-link').forEach(link => {
+    link.addEventListener('click', function() {
+      const id = this.getAttribute('data-id');
+      modalShow(id);
+    });
+  });
+  
+    function modalShow(id) {
+      const modal = document.getElementById(id);
+      const bsModal = new bootstrap.Modal(modal);
+      bsModal.show();
+    }
+  
+    function modalClose() {
+      document.querySelectorAll('.modal').forEach(modal => {
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        if (bsModal) {
+          bsModal.hide();
+        }
+      });
+    }
 </script>
 
 {% endblock %}

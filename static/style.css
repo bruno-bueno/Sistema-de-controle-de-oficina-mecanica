@@ -7,4 +7,5 @@ body{
     height: 100vh;
     width: 3.5vw;
     background-color: #878787;
+    position: fixed;
 }
