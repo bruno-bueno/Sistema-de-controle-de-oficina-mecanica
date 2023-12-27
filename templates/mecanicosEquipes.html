@@ -6,90 +6,115 @@
   <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 43vh;">
     <h4 style="float: left;">Equipes</h4>
     <button data-bs-toggle="modal" data-bs-target="#modalEquipe" class="btn btn-dark mb-4" style="float: right;">Adicionar Equipes</button>
-    <table class="table table-striped" style="max-height: 32vh;">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Equipe</th>
-          <th scope="col">Especialidade</th>
-          <th scope="col">Mecânicos</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for equipe in equipes %}
-        <tr>
-          <th scope="row">{{ equipe.id_equipes }}</th>
-          <td>{{ equipe.nome }}</td>
-          <td>{{ obterEspecialidadeEquipe(equipe.id_equipes) }}</td>
-          <td>{{ obterMecanico(equipe.id_equipes) }}</td>
-          <td><button data-id="{{ equipe.id_equipes }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
-        </tr>
-        <div class="modal fade modal-lg ordem-servico-modal" id="{{equipe.id_equipes}}" tabindex="-1">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <p class="fs-4"><b>Cod: </b>{{ equipe.id_equipes }}</p>
-                <p class="fs-4"><b>Nome: </b>{{ equipe.nome }}</p>
-                <p class="fs-4"><b>Especialidae: </b>{{ obterEspecialidadeEquipe(equipe.id_equipes) }}</p>
-                <p class="fs-4"><b>Mecânicos: </b>{{ obterMecanico(equipe.id_equipes) }}</p>
+    <div class="w-100" style="overflow-y: scroll; max-height: 28vh;">
+      <table class="table table-striped" style="max-height: 32vh;">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Equipe</th>
+            <th scope="col">Especialidade</th>
+            <th scope="col">Mecânicos</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for equipe in equipes %}
+          <tr>
+            <th scope="row">{{ equipe.id_equipes }}</th>
+            <td>{{ equipe.nome }}</td>
+            <td>{{ obterEspecialidadeEquipe(equipe.id_equipes) }}</td>
+            <td>{% for mecanico in obterMecanico(equipe.id_equipes) %}
+              {{ mecanico.nome }},
+            {% endfor %}</td>
+            <td><button data-id="um{{ equipe.id_equipes }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
+          </tr>
+          <div class="modal fade modal-lg ordem-servico-modal" id="um{{equipe.id_equipes}}" tabindex="-1">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <p class="fs-4"><b>Cod: </b>{{ equipe.id_equipes }}</p>
+                  <p class="fs-4"><b>Nome: </b>{{ equipe.nome }}</p>
+                  <p class="fs-4"><b>Especialidae: </b>{{ obterEspecialidadeEquipe(equipe.id_equipes) }}</p>
+                  <p class="fs-4"><b>Mecânicos: </b>
+                    {% for mecanico in obterMecanico(equipe.id_equipes) %}
+                      {{ mecanico.nome }},
+                    {% endfor %}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        {% endfor %}
-      </tbody>
-    </table>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
   
   <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 40vh;">
     <h4 style="float: left;">Mecânicos</h4>
     <button data-bs-toggle="modal" data-bs-target="#modalMecanicos" class="btn btn-dark mb-4" style="float: right;">Adicionar Mecânico</button>
-    <table class="table table-striped" style="max-height: 32vh;">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Nome</th>
-          <th scope="col">Especialidade</th>
-          <th scope="col">Endereço</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for mecanico in mecanicos %}
-        <tr>
-          <th scope="row">{{mecanico.id_mecanicos}}</th>
-          <td>{{mecanico.nome}}</td>
-          <td>{{ obterEspecialidadeMecanico(mecanico.id_mecanicos) }}</td>
-          <td>{{ obterEndereco(mecanico.id_endereco).rua }}</td>
-          <td><button data-id="{{ mecanico.id_mecanicos }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
-        </tr>
-        <div class="modal fade modal-lg ordem-servico-modal" id="{{mecanico.id_mecanicos}}" tabindex="-1">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <p class="fs-4"><b>Cod: </b>{{ mecanico.id_mecanicos }}</p>
-                <p class="fs-4"><b>Nome: </b>{{ mecanico.nome }}</p>
-                <p class="fs-4"><b>Especialidade: </b>{{ obterEspecialidadeMecanico(mecanico.id_mecanicos) }}</p>
-                <p class="fs-4"><b>CEP: </b>{{ obterEndereco(mecanico.id_endereco).cep }}</p>
-                <p class="fs-4"><b>Rua: </b>{{ obterEndereco(mecanico.id_endereco).rua }}</p>
-                <p class="fs-4"><b>Bairro: </b>{{ obterEndereco(mecanico.id_endereco).bairro }}</p>
-                <p class="fs-4"><b>Numero: </b>{{ obterEndereco(mecanico.id_endereco).numero }}</p>
+    <div class="w-100"style="overflow-y: scroll; max-height: 28vh;">
+        <table class="table table-striped" style="max-height: 32vh;">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Especialidade</th>
+            <th scope="col">Endereço</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for mecanico in mecanicos %}
+          <tr>
+            <th scope="row">{{mecanico.id_mecanicos}}</th>
+            <td>{{mecanico.nome}}</td>
+            <td>{{ obterEspecialidadeMecanico(mecanico.id_mecanicos) }}</td>
+            <td>{{ obterEndereco(mecanico.id_endereco).rua }}</td>
+            <td><button data-id="dois{{ mecanico.id_mecanicos }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
+          </tr>
+          <div class="modal fade modal-lg ordem-servico-modal" id="dois{{mecanico.id_mecanicos}}" tabindex="-1">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <p class="fs-4"><b>Cod: </b>{{ mecanico.id_mecanicos }}</p>
+                  <p class="fs-4"><b>Nome: </b>{{ mecanico.nome }}</p>
+                  <p class="fs-4"><b>Especialidade: </b>{{ obterEspecialidadeMecanico(mecanico.id_mecanicos) }}</p>
+                  <p class="fs-4"><b>CEP: </b>{{ obterEndereco(mecanico.id_endereco).cep }}</p>
+                  <p class="fs-4"><b>Rua: </b>{{ obterEndereco(mecanico.id_endereco).rua }}</p>
+                  <p class="fs-4"><b>Bairro: </b>{{ obterEndereco(mecanico.id_endereco).bairro }}</p>
+                  <p class="fs-4"><b>Numero: </b>{{ obterEndereco(mecanico.id_endereco).numero }}</p>
+                  <p class="fs-4"><b>Equipe: </b>{{ obterEquipe(mecanico.id_equipe).nome }}</p>
+                  <button class="btn btn-dark" onclick="mostrarInputEquipe('{{mecanico.id_mecanicos}}')">Trocar Equipe</button>
+                  <div id="inputEquipe{{mecanico.id_mecanicos}}" style="display: none;">
+                    <form action="/alterarEquipe" method="POST">
+                      <input type="hidden" name="id" value="{{mecanico.id_mecanicos}}">
+                      <select class="form-select my-3 " name="equipe" aria-label="Default select example">
+                        <option selected>Adicione a peça caso ela não exista!</option>
+                        {% for equipe in equipes %}
+                        <option value="{{equipe.id_equipes}}">{{equipe.nome}}</option>
+                        {% endfor %}
+                      </select>
+                      <button class="btn btn-dark">Confirmar</button>
+                    </form> 
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        {% endfor %}
-      </tbody>
-    </table>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    
   </div>
   
 </div>
@@ -106,7 +131,7 @@
           <h6>Nome da Equipe</h6>
           <input type="text" class="form-control mb-3" name="nome" id="nome" required>
           <h6>Selecione a Especialidade</h6>
-          <select class="form-select mb-3" name="servico" aria-label="Default select example">
+          <select id="servico" class="form-select mb-3" style="width: 100%;" name="servico" aria-label="Default select example">
             <option selected>Abra Este Menu</option>
             {% for servico in servicos %}
             <option value="{{servico.id_servicos}}">{{servico.nome}}</option>
@@ -149,7 +174,7 @@
             {% endfor %}
           </select>
           <h6>Selecione a Equipe</h6>
-          <select class="form-select mb-3" name="equipe" aria-label="Default select example">
+          <select id="equipes" class="form-select mb-3" name="equipe" style="width: 100%;" aria-label="Default select example">
             <option selected>Caso não existam equipes adicione uma</option>
             {% for equipe in equipes %}
             <option value="{{equipe.id_equipes}}">{{equipe.nome}}</option>
@@ -201,6 +226,19 @@
       }
     });
   }
+
+  function mostrarInputEquipe(id){
+    let inputContainer = document.getElementById(`inputEquipe${id}`);
+    inputContainer.style.display = "block";
+  }
+  $(document).ready(function() {
+      $("#equipes").select2({
+        dropdownParent: $('#modalMecanicos .modal-content')
+      });
+      $("#servico").select2({
+        dropdownParent: $('#modalEquipe .modal-content')
+      });
+    });
 </script>
 
 {% endblock %}

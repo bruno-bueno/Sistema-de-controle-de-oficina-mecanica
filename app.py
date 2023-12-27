@@ -6,7 +6,7 @@ from model import db, Usuario, Servicos, Pecas, Endereco, Cliente, Veiculo, Equi
 
 app = Flask(__name__)
 
-app.config['PERMANENT_SESSION_LIFETIME'] = 3600
+app.config['PERMANENT_SESSION_LIFETIME'] = 4000
 
 app.secret_key = os.getenv('SECRET_KEY')
 
@@ -45,46 +45,111 @@ def login():
 
     return render_template('login.html')
 
-@app.route("/home", methods=['GET'])
+@app.route("/home", methods=['GET', 'POST'])
 def homeUm():
     print(f"usuario: {session}")
-    if(session):
+    if session:
         clientes = Cliente.query.all()
         equipes = Equipes.query.all()
         veiculos = Veiculo.query.all()
         servicos = Servicos.query.all()
         pecas = Pecas.query.all()
-        ordensServicos = OrdemServico.query.all()
-        return render_template('index.html', clientes = clientes, equipes = equipes, veiculos = veiculos, servicos = servicos, pecas = pecas, ordensServicos = ordensServicos, obterServico = obterServico)
+        if request.method == 'POST':
+           status_ordem = request.form['ordem']
+           ordensServicos = OrdemServico.query.filter_by(status_ordem=status_ordem).all() 
+        else:
+            ordensServicos = OrdemServico.query.all()
+        return render_template('index.html', clientes = clientes, equipes = equipes, veiculos = veiculos, servicos = servicos, pecas = pecas, ordensServicos = ordensServicos, obterServico = obterServico, obterEquipe = obterEquipe, obterPecas = obterPecas)
     return redirect('/login')
 
 @app.route("/ordemServicos", methods=['POST'])
 def ordemServicos():
-    if request.method == 'POST':
-        defeito = request.form['defeito']
-        dataEmissao = request.form['dataEmissao']
-        previsaoEntrega = request.form['previsaoEntrega']
-        cliente = int(request.form['cliente'])
-        veiculo = request.form['veiculo']
-        servico = int(request.form['servico'])
-        peca = int(request.form['peca'])
-        equipe = int(request.form['equipe'])
-        valor = float(request.form['valor'])
+    if session:
+        if request.method == 'POST':
+            defeito = request.form['defeito']
+            dataEmissao = request.form['dataEmissao']
+            previsaoEntrega = request.form['previsaoEntrega']
+            veiculo = request.form['veiculo']
+            equipe = int(request.form['equipe'])
 
-        ordemServico = OrdemServico(defeito = defeito, data_emissao = dataEmissao, previsao_entrega = previsaoEntrega, status_ordem = 0, id_cliente = cliente, id_equipes = equipe, id_veiculo = veiculo, valor_cobrado = valor)
-        db.session.add(ordemServico)
-        db.session.commit()
+            ordemServico = OrdemServico(defeito = defeito, data_emissao = dataEmissao, previsao_entrega = previsaoEntrega, status_ordem = 0, id_equipes = equipe, id_veiculo = veiculo, valor_cobrado = 0.00)
+            db.session.add(ordemServico)
+            db.session.commit()
+            return redirect('/home')
+    return redirect('/login')
 
-        ordemServico_id = ordemServico.id_ordem_servicos
+@app.route("/adicionarServicoOrdem", methods=['POST'])
+def adicionarServicoOrdem():
+    if session:
+        if request.method == 'POST':
+            ordemServicoId = int(request.form['id'])
+            servico = int(request.form['servico'])
+            quantidade = int(request.form['quantidade'])
+            
+            ordemServicosHasServicos = OrdemServicosHasServicos(ordem_servicos_id_ordem_servicos = ordemServicoId, servicos_id_servicos = servico, quantidade = quantidade)
+            db.session.add(ordemServicosHasServicos)
+            db.session.commit()
+            return redirect('/home')
+    return redirect('/login')
 
-        pecasHasOrdemServicos = PecasHasOrdemServicos(pecas_id_pecas = peca, ordem_servicos_id_ordem_servicos = ordemServico_id)
-        db.session.add(pecasHasOrdemServicos)
-        db.session.commit()
+@app.route("/adicionarPecaOrdem", methods=['POST'])
+def adicionarPecaOrdem():
+    if session:
+        if request.method == 'POST':
+            ordemServicoId = int(request.form['id'])
+            peca = int(request.form['peca'])
+            quantidade = int(request.form['quantidade'])
+            
+            pecaOrdemServico = PecasHasOrdemServicos(pecas_id_pecas=peca, ordem_servicos_id_ordem_servicos=ordemServicoId)
+            db.session.add(pecaOrdemServico)
+            db.session.commit()
+            
+            return redirect('/home')
+    return redirect('/login')
 
-        ordemServicosHasServicos = OrdemServicosHasServicos(ordem_servicos_id_ordem_servicos = ordemServico_id, servicos_id_servicos = servico)
-        db.session.add(ordemServicosHasServicos)
-        db.session.commit()
-        return redirect('/home')
+@app.route("/adicionarValor", methods=['POST'])
+def adicionarValor():
+    if session:
+        if request.method == 'POST':
+            ordemServicoId = int(request.form['id'])
+            valor = int(request.form['valor'])
+            
+            ordem = OrdemServico.query.filter_by(id_ordem_servicos=ordemServicoId).first()
+            ordem.valor_cobrado = valor
+            db.session.add(ordem)
+            db.session.commit()
+            
+            return redirect('/home')
+    return redirect('/login')
+
+@app.route("/adicionarValorServico", methods=['POST'])
+def adicionarValorServico():
+    if session:
+        if request.method == 'POST':
+            id = int(request.form['id'])
+            valor = int(request.form['valor'])
+            
+            servico = Servicos.query.filter_by(id_servicos=id).first()
+            servico.valor = valor
+            db.session.add(servico)
+            db.session.commit()
+            
+            return redirect('/servicos')
+    return redirect('/login')
+
+@app.route("/adicionarValorPecas", methods=['POST'])
+def adicionarValorPecas():
+    if session:
+        if request.method == 'POST':
+            id = int(request.form['id'])
+            valor = int(request.form['valor'])
+            
+            peca = Pecas.query.filter_by(id_pecas=id).first()
+            peca.valor = valor
+            db.session.add(peca)
+            db.session.commit()
+            
+            return redirect('/pecas')
     return redirect('/login')
 
 @app.route("/clientesVeiculos", methods=['GET'])
@@ -170,7 +235,7 @@ def mecanicosEquipes():
         servicos = Servicos.query.all()
         equipes = Equipes.query.all()
         mecanicos = Mecanico.query.all()
-        return render_template('mecanicosEquipes.html',servicos = servicos, equipes = equipes, mecanicos = mecanicos, obterEspecialidadeEquipe=obterEspecialidadeEquipe, obterEspecialidadeMecanico=obterEspecialidadeMecanico, obterEndereco = obterEndereco, obterMecanico = obterMecanico)
+        return render_template('mecanicosEquipes.html',servicos = servicos, equipes = equipes, mecanicos = mecanicos, obterEspecialidadeEquipe=obterEspecialidadeEquipe, obterEspecialidadeMecanico=obterEspecialidadeMecanico, obterEndereco = obterEndereco, obterMecanico = obterMecanico, obterEquipe = obterEquipe)
     return redirect('/login')
 
 @app.route("/mecanicos", methods=['POST'])
@@ -266,20 +331,6 @@ def addUsuarios():
         return redirect('/usuarios')
     return redirect('/login')
 
-@app.route("/metasFinalizadas", methods=['GET'])
-def metasFinalizadas():
-    print(f"usuario: {session}")
-    if(session):
-        print(f"usuario2: {session.get('id_usuario')}")
-        clientes = Cliente.query.all()
-        equipes = Equipes.query.all()
-        veiculos = Veiculo.query.all()
-        servicos = Servicos.query.all()
-        pecas = Pecas.query.all()
-        ordensServicos = OrdemServico.query.all()
-        return render_template('metasFinalizadas.html', clientes = clientes, equipes = equipes, veiculos = veiculos, servicos = servicos, pecas = pecas, ordensServicos = ordensServicos, obterServico = obterServico)
-    return redirect('/login')
-
 @app.route("/statusOrdem", methods=['POST'])
 def alterarStatus():
     print("chegou")
@@ -291,9 +342,48 @@ def alterarStatus():
         db.session.commit()
     return redirect('/home')
 
+@app.route("/deletarOrdem", methods=['POST'])
+def deletarOrdem():
+    print("chegou")
+
+    id = request.form.get('id')
+    ordem = OrdemServico.query.filter_by(id_ordem_servicos = id).first()
+    ordemHasServicos = OrdemServicosHasServicos.query.filter_by(ordem_servicos_id_ordem_servicos = id).all()
+    ordemHasPecas = PecasHasOrdemServicos.query.filter_by(ordem_servicos_id_ordem_servicos = id).all()
+
+    print(ordem)
+    if ordemHasPecas:
+        for ordemHasPeca in ordemHasPecas:
+            db.session.delete(ordemHasPeca)
+            db.session.commit()
+        
+    if ordemHasServicos:
+        for ordemHasServico in ordemHasServicos:
+            db.session.delete(ordemHasServico)
+            db.session.commit()
+            
+    if ordem:
+        db.session.delete(ordem)
+        db.session.commit()
+    return redirect('/home')
+
+@app.route("/alterarEquipe", methods=['POST'])
+def alterarEquipe():
+    if session:
+        if request.method == 'POST':
+            id = int(request.form['id'])
+            equipe = int(request.form['equipe'])
+            
+            mecanico = Mecanico.query.filter_by(id_mecanicos=id).first()
+            mecanico.id_equipe = equipe
+            db.session.add(mecanico)
+            db.session.commit()
+            
+            return redirect('/mecanicosEquipes')
+    return redirect('/login')
+
 @app.route("/sair", methods=['GET'])
 def sair():
-    print("veio")
     session.clear()
     return redirect('/login')
 
@@ -324,9 +414,11 @@ def obterEndereco(id_endereco):
     return 'Endereço não encontrado'
 
 def obterMecanico(id_equipe):
-    mecanicos = Mecanico.query.filter_by( id_equipe = id_equipe ).first()
+    mecanicos = Mecanico.query.filter_by( id_equipe = int(id_equipe)).all()
     if mecanicos:
-        return mecanicos.nome
+        print("teste:")
+        print(mecanicos)
+        return mecanicos
     return 'Mecânicos não encontrado'
 
 def obterCliente(id_cliente):
@@ -335,14 +427,43 @@ def obterCliente(id_cliente):
         return cliente.nome
     return 'Cliente não encontrado'
 
+def obterEquipe(id_equipe):
+    equipe = Equipes.query.filter_by(id_equipes = id_equipe).first()
+    if equipe:
+        return equipe
+    return 'Equipe não encontrada'
+
 def obterServico(id_ordem_servicos):
-    servicoId = OrdemServicosHasServicos.query.filter_by(ordem_servicos_id_ordem_servicos=id_ordem_servicos).with_entities(OrdemServicosHasServicos.servicos_id_servicos).first()
-    if servicoId is not None:
-        servico = Servicos.query.filter_by(id_servicos=servicoId[0]).first()
+    servicoIds = OrdemServicosHasServicos.query.filter_by(ordem_servicos_id_ordem_servicos=id_ordem_servicos).all()
+    servicos = []
+
+    for servicoId in servicoIds:
+        servico = Servicos.query.filter_by(id_servicos=servicoId.servicos_id_servicos).first()
         if servico:
             print(servico)
-            return servico
-    return 'Serviço não encontrado'
+            servicos.append(servico)
+
+    if servicos:
+        return servicos
+    else:
+        return 'Serviço não encontrado'
+    
+def obterPecas(id_ordem_servicos):
+    pecaIds = PecasHasOrdemServicos.query.filter_by(ordem_servicos_id_ordem_servicos=id_ordem_servicos).all()
+    pecas = []
+
+    for peca_id in pecaIds:
+        peca = Pecas.query.filter_by(id_pecas=peca_id.pecas_id_pecas).first()
+        if peca:
+            print(peca)
+            pecas.append(peca)
+
+    if pecas:
+        return pecas
+    else:
+        return 'Peças não encontradas'
+
+
 
 if __name__ == "__main__":
     app.run(debug=True,host='0.0.0.0')

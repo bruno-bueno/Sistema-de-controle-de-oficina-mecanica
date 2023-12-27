@@ -6,7 +6,8 @@
   <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 86vh;">
     <h4 style="float: left;">Serviços</h4>
     <button data-bs-toggle="modal" data-bs-target="#modal" class="btn btn-dark mb-4" style="float: right;">Adicionar Serviço</button>
-    <table class="table table-striped" style="max-height: 74vh;">
+    <div class="w-100" style="overflow-y: scroll; max-height: 70vh;">
+      <table class="table table-striped" style="max-height: 74vh;">
         <thead>
           <tr>
             <th scope="col">#</th>
@@ -22,7 +23,7 @@
               <th scope="row">{{ servico.id_servicos }}</th>
               <td>{{ servico.nome }}</td>
               <td>{{ servico.descricao}}</td>
-              <td>{{ servico.valor }}</td>
+              <td>R$ {{ servico.valor }}</td>
               <td><button data-id="{{ servico.id_servicos }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
             </tr>
             <div class="modal fade modal-lg ordem-servico-modal" id="{{servico.id_servicos}}" tabindex="-1">
@@ -37,17 +38,22 @@
                     <p class="fs-4"><b>Nome: </b>{{ servico.nome }}</p>
                     <p class="fs-4"><b>Marca: </b>{{ servico.descricao }}</p>
                     <p class="fs-4"><b>Valor: </b>R${{ servico.valor }}</p>
-                    <h3>{{ servico.id_servicos }}</h3>
-                    <h3>Nome: {{ servico.nome }}</h3>
-                    <h3>Marca: {{ servico.descricao }}</h3>
-                    <h3>Valor: R${{ servico.valor }}</h3>
+                    <button class="btn btn-dark" onclick="mostrarInputValor('{{servico.id_servicos}}')">Alterar Valor</button>
+                    <div id="inputValor{{servico.id_servicos}}" style="display: none;">
+                      <form action="/adicionarValorServico" method="POST">
+                        <input type="hidden" name="id" value="{{servico.id_servicos}}">
+                        <input class="form-control my-2" type="text" name="valor">
+                        <button class="btn btn-dark">Confirmar</button>
+                      </form>  
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           {% endfor %}
         </tbody>
-    </table>
+      </table>
+    </div>
   </div>
     
 </div>
@@ -65,8 +71,8 @@
             <input type="text" class="form-control mb-3" name="nome" id="nome" required>
             <h6>Descrição do Serviço</h6>
             <input type="text" class="form-control mb-3" name="descricao"  id="descricao" required>
-            <h6>Numero</h6>
-            <input type="text" class="form-control mb-3" name="numero" id="numero" required>
+            <h6>Valor</h6>
+            <input type="text" class="form-control mb-3" name="valor" id="valor" required>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -98,6 +104,10 @@
                 bsModal.hide();
             }
         });
+    }
+    function mostrarInputValor(id){
+      let inputContainer = document.getElementById(`inputValor${id}`);
+      inputContainer.style.display = "block";
     }
   </script>
 

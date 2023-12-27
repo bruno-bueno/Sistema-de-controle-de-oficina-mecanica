@@ -6,46 +6,55 @@
   <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 86vh;">
     <h4 style="float: left;">Peças</h4>
     <button data-bs-toggle="modal" data-bs-target="#modal" class="btn btn-dark mb-4" style="float: right;">Adicionar Peça</button>
-    <table class="table table-striped" style="max-height: 74vh;">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Nome</th>
-          <th scope="col">Marca</th>
-          <th scope="col">Valor</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for peca in pecas %}
+    <div class="w-100" style="overflow-y: scroll; max-height: 70vh;">
+      <table class="table table-striped" style="max-height: 74vh;">
+        <thead>
           <tr>
-            <th scope="row">{{ peca.id_pecas }}</th>
-            <td>{{ peca.nome_da_peca }}</td>
-            <td>{{ peca.marca }}</td>
-            <td>{{ peca.valor }}</td>
-            <td><button data-id="{{ peca.id_pecas }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
+            <th scope="col">#</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Marca</th>
+            <th scope="col">Valor</th>
+            <th scope="col"></th>
           </tr>
-          <div class="modal fade modal-lg ordem-servico-modal" id="{{peca.id_pecas}}" tabindex="-1">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes</h1>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <p class="fs-4"><b>Cod: </b>{{ peca.id_pecas }}</p>
-                  <p class="fs-4"><b>Nome: </b>{{ peca.nome_da_peca }}</p>
-                  <p class="fs-4"><b>Marca: </b>{{ peca.marca }}</p>
-                  <p class="fs-4"><b>Valor: </b>R${{ peca.valor }}</p>
+        </thead>
+        <tbody>
+          {% for peca in pecas %}
+            <tr>
+              <th scope="row">{{ peca.id_pecas }}</th>
+              <td>{{ peca.nome_da_peca }}</td>
+              <td>{{ peca.marca }}</td>
+              <td>R$ {{ peca.valor }}</td>
+              <td><button data-id="{{ peca.id_pecas }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
+            </tr>
+            <div class="modal fade modal-lg ordem-servico-modal" id="{{peca.id_pecas}}" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p class="fs-4"><b>Cod: </b>{{ peca.id_pecas }}</p>
+                    <p class="fs-4"><b>Nome: </b>{{ peca.nome_da_peca }}</p>
+                    <p class="fs-4"><b>Marca: </b>{{ peca.marca }}</p>
+                    <p class="fs-4"><b>Valor: </b>R${{ peca.valor }}</p>
+                    <button class="btn btn-dark" onclick="mostrarInputValor('{{peca.id_pecas}}')">Alterar Valor</button>
+                      <div id="inputValor{{peca.id_pecas}}" style="display: none;">
+                        <form action="/adicionarValorPecas" method="POST">
+                          <input type="hidden" name="id" value="{{peca.id_pecas}}">
+                          <input class="form-control my-2" type="text" name="valor">
+                          <button class="btn btn-dark">Confirmar</button>
+                        </form>  
+                      </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        {% endfor %}
-      </tbody>
-    </table>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
-    
 </div>
 
 <div class="modal fade modal-lg" id="modal" tabindex="-1" >
@@ -94,6 +103,10 @@
               bsModal.hide();
           }
       });
+  }
+  function mostrarInputValor(id){
+    let inputContainer = document.getElementById(`inputValor${id}`);
+    inputContainer.style.display = "block";
   }
 </script>
 

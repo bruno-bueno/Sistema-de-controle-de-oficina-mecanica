@@ -6,7 +6,8 @@
   <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 43vh;">
     <h4 style="float: left;">Clientes</h4>
     <button data-bs-toggle="modal" data-bs-target="#modalClientes" class="btn btn-dark mb-4" style="float: right;">Adicionar Cliente</button>
-    <table class="table table-striped" style="max-height: 32vh;">
+    <div class="w-100" style="overflow-y: scroll; max-height: 28vh;">
+      <table class="table table-striped" style="max-height: 32vh;">
         <thead>
           <tr>
             <th scope="col">#</th>
@@ -21,9 +22,9 @@
               <th scope="row">{{ cliente.id_clientes }}</th>
               <td>{{ cliente.nome }}</td>
               <td>{{ obterEndereco(cliente.id_endereco).rua }}</td>
-              <td><button data-id="{{ cliente.id_clientes }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
+              <td><button data-id="um{{ cliente.id_clientes }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
             </tr>
-            <div class="modal fade modal-lg ordem-servico-modal" id="{{cliente.id_clientes}}" tabindex="-1">
+            <div class="modal fade modal-lg ordem-servico-modal" id="um{{cliente.id_clientes}}" tabindex="-1">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -44,13 +45,15 @@
           {% endfor %}
 
         </tbody>
-    </table>
+      </table>
+    </div>
   </div>
   
   <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 43vh;">
     <h4 style="float: left;">Veículos</h4>
     <button data-bs-toggle="modal" data-bs-target="#modalCarros" class="btn btn-dark mb-4" style="float: right;">Adicionar Carro</button>
-    <table class="table table-striped" style="max-height: 32vh;">
+    <div class="w-100" style="overflow-y: scroll; max-height: 28vh;">
+      <table class="table table-striped" style="max-height: 32vh;">
         <thead>
           <tr>
             <th scope="col">#</th>
@@ -67,9 +70,9 @@
               <td>{{veiculo.placa}}</td>
               <td>{{veiculo.modelo}}</td>
               <td>{{ obterCliente(veiculo.id_cliente) }}</td>
-              <td><button data-id="{{ veiculo.id_veiculos }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
+              <td><button data-id="dois{{ veiculo.id_veiculos }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
             </tr>
-            <div class="modal fade modal-lg ordem-servico-modal" id="{{veiculo.id_veiculos}}" tabindex="-1">
+            <div class="modal fade modal-lg ordem-servico-modal" id="dois{{veiculo.id_veiculos}}" tabindex="-1">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -80,14 +83,18 @@
                     <p class="fs-4"><b>Cod: </b>{{ veiculo.id_veiculos }}</p>
                     <p class="fs-4"><b>Placa: </b>{{ veiculo.placa }}</p>
                     <p class="fs-4"><b>Modelo: </b>{{ veiculo.modelo }}</p>
-                    <p class="fs-4"><b>Cliente: </b>{{ obterCliente(veiculo.id_veiculos) }}</p>
+                    <p class="fs-4"><b>Marca: </b>{{ veiculo.marca }}</p>
+                    <p class="fs-4"><b>Ano: </b>{{ veiculo.ano }}</p>
+                    <p class="fs-4"><b>Cor: </b>{{ veiculo.cor }}</p>
+                    <p class="fs-4"><b>Dono: </b>{{ obterCliente(veiculo.id_veiculos) }}</p>
                   </div>
                 </div>
               </div>
             </div>
           {% endfor %}
         </tbody>
-    </table>
+      </table>
+    </div>
   </div>
     
 </div>
@@ -141,7 +148,7 @@
         <h6>Cor</h6>
         <input type="text" class="form-control mb-3" name="cor" id="cor" required>
         <h6>Dono do Veículo</h6>
-        <select class="form-select mb-3" name="cliente" aria-label="Default select example">
+        <select id="donoVeiculo" class="form-select mb-3" style="width: 100%;" name="cliente" aria-label="Default select example">
           <option selected>Abra Este Menu</option>
           {% for cliente in clientes %}
             <option value="{{cliente.id_clientes}}">{{cliente.nome}}</option>
@@ -192,6 +199,11 @@
         }
       });
     }
+    $(document).ready(function() {
+      $("#donoVeiculo").select2({
+        dropdownParent: $('#modalCarros .modal-content')
+      });
+    });
 </script>
 
 {% endblock %}

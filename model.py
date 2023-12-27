@@ -59,7 +59,6 @@ class OrdemServico(db.Model):
     previsao_entrega = db.Column(db.Date) 
     status_ordem = db.Column(db.SmallInteger) 
     valor_cobrado = db.Column(db.Float)
-    id_cliente = db.Column(db.Integer, db.ForeignKey('clientes.id_clientes')) 
     id_equipes = db.Column(db.Integer, db.ForeignKey('equipes.id_equipes'))
     id_veiculo = db.Column(db.Integer, db.ForeignKey('veiculos.id_veiculos'))
 
@@ -84,8 +83,10 @@ class PecasHasOrdemServicos(db.Model):
     __tablename__ = 'pecas_has_ordem_servicos' 
     pecas_id_pecas = db.Column(db.Integer, db.ForeignKey('pecas.id_pecas'), primary_key=True)
     ordem_servicos_id_ordem_servicos = db.Column(db.Integer, db.ForeignKey('ordem_servicos.id_ordem_servicos'), primary_key=True)
+    quantidade = db.Column(db.Integer) 
 
 class OrdemServicosHasServicos(db.Model): 
     __tablename__ = 'ordem_servicos_has_servicos' 
     ordem_servicos_id_ordem_servicos = db.Column(db.Integer, db.ForeignKey('ordem_servicos.id_ordem_servicos'), primary_key=True)
     servicos_id_servicos = db.Column(db.Integer, db.ForeignKey('servicos.id_servicos'), primary_key=True)
+    quantidade = db.Column(db.Integer) 

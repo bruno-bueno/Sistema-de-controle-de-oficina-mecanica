@@ -2,37 +2,66 @@
 
 {% block conteudo %}
 
-  <div class="mt-4">
-    <h3 style="float: left;" >Ordens de Serviço</h3>
-    <button data-bs-toggle="modal" data-bs-target="#modal" class="btn btn-dark" style="float: right;">Adicionar Ordem de Serviços</button>
-  </div>
-  <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 38vh;">
-      <h4 class="mb-4">Ordens de Serviços Pendentes</h4>
-      <table class="table table-striped" style="max-height: 27vh;">
+  <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 80vh;">
+      <h4  style="float: left;">Ordens de Serviços</h4>
+      <button data-bs-toggle="modal" data-bs-target="#modal" class=" btn btn-dark" style="float: right;">Adicionar Ordem de Serviços</button>
+      <br>
+      <a onclick="mostrarFiltro()"><h6 style="cursor: pointer;" class="mt-3">Filtrar</h6></a>
+      <div class="filtro" style="display:none;">
+        <p>Status</p>
+        <form action="/home" method="post">
+          <select class="form-select w-25" style="float: left;" name="ordem" aria-label="Default select example" required>
+            <option selected>Adicione o serviço caso ele não exista!</option>
+            <option value="0">Pendente</option>
+            <option value="1">Em Atendimento</option>
+            <option value="2">Finalizada</option>
+          </select>          
+          <button class="ms-2 btn btn-dark" type="submit">Filtrar</button>  
+        </form>
+        <a href="{{ url_for('homeUm') }}"><button class="btn btn-dark mt-2">Limpar Filtro</button></a>
+      </div>
+        
+      <table class="table table-striped" style="max-height: 66vh;">
           <thead>
             <tr>
               <th scope="col">#</th>
               <th scope="col">Problema</th>
-              <th scope="col">Serviço</th>
-              <th scope="col">Prazo</th>
-              <th scope="col"></th>
+              <th scope="col">Status</th>
+              <th colspan="2" scope="col">Prazo</th>
+
             </tr>
           </thead>
           <tbody>
             {% for ordemServico in ordensServicos %}
-              {% if ordemServico.status_ordem == 0 %}
                 <tr>
                   <th scope="row">{{ ordemServico.id_ordem_servicos }}</th>
                   <td>{{ ordemServico.defeito }}</td>
-                  <td>{{ obterServico(ordemServico.id_ordem_servicos).nome }}</td>
+                    {% if ordemServico.status_ordem == 0 %}
+                      <td>Pendente</td>
+                    {% endif %}
+                    {% if ordemServico.status_ordem == 1 %}
+                      <td>Aberta</td>
+                    {% endif %}
+                    {% if ordemServico.status_ordem == 2 %}
+                      <td>Finalizada</td>
+                    {% endif %}
                   <td>{{ ordemServico.previsao_entrega }}</td>
                   <td><button data-id="{{ ordemServico.id_ordem_servicos }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
                 </tr>
+                
                 <div class="modal fade modal-lg ordem-servico-modal" id="{{ordemServico.id_ordem_servicos}}" tabindex="-1">
                   <div class="modal-dialog">
                     <div class="modal-content">
                       <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes</h1>
+                        {% if ordemServico.status_ordem == 0 %}
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"><b>Ordem Pendente</b></h1>
+                        {% endif %}
+                        {% if ordemServico.status_ordem == 1 %}
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"><b>Ordem Aberta</b></h1>
+                        {% endif %}
+                        {% if ordemServico.status_ordem == 2 %}
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"><b>Ordem Finalizada</b></h1>
+                        {% endif %}
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
@@ -40,79 +69,86 @@
                         <p class="fs-4"><b>Problema: </b>{{ ordemServico.defeito }}</p>
                         <p class="fs-4"><b>Data de emissão: </b>{{ ordemServico.data_emissao }}</p>
                         <p class="fs-4"><b>Previsão de Entrega: </b>{{ ordemServico.previsao_entrega }}</p>
-                        <p class="fs-4"><b>Serviço: </b>{{ obterServico(ordemServico.id_ordem_servicos).nome }}</p>
-                        <p class="fs-4"><b>Valor do Serviço: </b>{{ obterServico(ordemServico.id_ordem_servicos).valor }}</p>
+                        <p class="fs-4"><b>Equipe: </b>{{ obterEquipe(ordemServico.id_equipes).nome }}</p>
+                        {% if ordemServico.status_ordem == 1 %}
+                        <p class="fs-4"><b>Serviço: </b> </p>
+                        
+                        <button class="btn btn-dark" onclick="mostrarInputServico('{{ ordemServico.id_ordem_servicos }}')">Adicionar Novo Serviço</button>
+                        <div id="inputServico{{ ordemServico.id_ordem_servicos }}" style="display: none;">
+                          <form action="/adicionarServicoOrdem" method="POST">
+                            <input type="hidden" name="id" value="{{ordemServico.id_ordem_servicos}}">
+                            <select id="servico" class="form-select my-3" name="servico" aria-label="Default select example">
+                              <option selected>Adicione o serviço caso ele não exista!</option>
+                              {% for servico in servicos %}
+                              <option value="{{servico.id_servicos}}">{{servico.nome}}</option>
+                              {% endfor %}
+                            </select>
+                            <input class="form-control my-3 w-25" type="text" name="quantidade" placeholder="quantidade">
+                            <button class="btn btn-dark">Confirmar</button>
+                            <hr>
+                          </form>  
+                        </div>
+                        <hr>
+                        <p class="fs-4"><b>Peças: </b>
+                          {% for peca in obterPecas(ordemServico.id_ordem_servicos) %}
+                            {{ peca.nome_da_peca }} (Marca: {{ peca.marca }}, Valor: {{ peca.valor }}),
+                          {% endfor %}
+                        </p>
+                        <button class="btn btn-dark" onclick="mostrarInputPecas('{{ ordemServico.id_ordem_servicos }}')">Adicionar Nova Peça</button>
+                        <div id="inputPecas{{ ordemServico.id_ordem_servicos }}" style="display: none;">
+                          <form action="/adicionarPecaOrdem" method="POST">
+                            <input type="hidden" name="id" value="{{ordemServico.id_ordem_servicos}}">
+                            <select class="form-select my-3" name="peca" aria-label="Default select example">
+                              <option selected>Adicione a peça caso ela não exista!</option>
+                              {% for peca in pecas %}
+                              <option value="{{peca.id_pecas}}">{{peca.nome_da_peca}}</option>
+                              {% endfor %}
+                            </select>
+                            <input class="form-control my-3 w-25" type="text" name="quantidade" placeholder="quantidade">
+                            <button class="btn btn-dark">Confirmar</button>
+                          </form>  
+                        </div>
+                        <hr>
                         <p class="fs-4"><b>Valor Cobrado: </b>{{ ordemServico.valor_cobrado }}</p>
+                        <button class="btn btn-dark" onclick="mostrarInputValor('{{ ordemServico.id_ordem_servicos }}')">Atualizar o valor</button>
+                        <div id="inputValor{{ ordemServico.id_ordem_servicos }}" style="display: none;">
+                          <form action="/adicionarValor" method="POST">
+                            <input type="hidden" name="id" value="{{ordemServico.id_ordem_servicos}}">
+                            <input class="form-control my-2" type="text" name="valor">
+                            <button class="btn btn-dark">Confirmar</button>
+                          </form>  
+                        </div>
+                        {% endif %}
                       </div>
                       <div class="modal-footer">
+                        {% if ordemServico.status_ordem == 0 %}
                         <form action="/statusOrdem" method="POST">
                           <input type="hidden" name="valor" value="1">
                           <input type="hidden" name="id" value="{{ordemServico.id_ordem_servicos}}">
-                          <button type="submit" class="btn btn-dark">Alterar para em andamento</button>                    
+                          <button type="submit" class="btn btn-dark">Alterar para Em andamento</button>                    
+                        </form>
+                        {% endif %}
+                        {% if ordemServico.status_ordem == 1 %}
+                        <form action="/statusOrdem" method="POST">
+                          <input type="hidden" name="valor" value="2">
+                          <input type="hidden" name="id" value="{{ordemServico.id_ordem_servicos}}">
+                          <button type="submit" class="btn btn-dark">Alterar para Concluida</button>                    
+                        </form>
+                        {% endif %}
+                        <form action="/deletarOrdem" method="POST">
+                          <input type="hidden" name="id" value="{{ordemServico.id_ordem_servicos}}">
+                          <button type="submit" class="btn btn-danger">Deletar</button>
                         </form>
                       </div>
                     </div>
                   </div>
                 </div>
-              {% endif %}
             {% endfor %}
           </tbody>
       </table> 
   </div>
-  <div class="mt-4 p-4 bg-light rounded-4" style="max-height: 38vh;">
-    <h4 class="mb-4">Ordens de Serviços Em andamento</h4>
-    <table class="table table-striped" style="max-height: 27vh;">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Problema</th>
-          <th scope="col">Serviço</th>
-          <th scope="col">Prazo</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for ordemServico in ordensServicos %}
-          {% if ordemServico.status_ordem == 1 %}
-            <tr>
-              <th scope="row">{{ ordemServico.id_ordem_servicos }}</th>
-              <td>{{ ordemServico.defeito }}</td>
-              <td>{{ obterServico(ordemServico.id_ordem_servicos).nome }}</td>
-              <td>{{ ordemServico.previsao_entrega }}</td>
-              <td><button data-id="{{ ordemServico.id_ordem_servicos }}" class="btn btn-dark modal-link" style="float: right;">Detalhes</button></td>
-            </tr>
-            <div class="modal fade modal-lg ordem-servico-modal" id="{{ordemServico.id_ordem_servicos}}" tabindex="-1">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Detalhes</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <p class="fs-4"><b>Cod: </b>{{ ordemServico.id_ordem_servicos }}</p>
-                    <p class="fs-4"><b>Problema: </b>{{ ordemServico.defeito }}</p>
-                    <p class="fs-4"><b>Data de emissão: </b>{{ ordemServico.data_emissao }}</p>
-                    <p class="fs-4"><b>Previsão de Entrega: </b>{{ ordemServico.previsao_entrega }}</p>
-                    <p class="fs-4"><b>Serviço: </b>{{ obterServico(ordemServico.id_ordem_servicos).nome }}</p>
-                    <p class="fs-4"><b>Valor do Serviço: </b>{{ obterServico(ordemServico.id_ordem_servicos).valor }}</p>
-                    <p class="fs-4"><b>Valor Cobrado: </b>{{ ordemServico.valor_cobrado }}</p>
-                  </div>
-                  <div class="modal-footer">
-                    <form action="/statusOrdem" method="POST">
-                      <input type="hidden" name="valor" value="2">
-                      <input type="hidden" name="id" value="{{ordemServico.id_ordem_servicos}}">
-                      <button type="submit" class="btn btn-dark">Alterar para Concluida</button>                    
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          {% endif %}
-        {% endfor %}
-      </tbody>
-  </table>  
 
-</div>
-<div class="modal fade modal-lg" id="modal" tabindex="-1" >
+<div class="modal fade modal-lg" id="modal" style="overflow:hidden;" role="dialog" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <form action="{{ url_for('ordemServicos') }}" method="post">
@@ -121,53 +157,31 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+
+          <h6>Escolha o Veículo</h6>
+          <select class="form-control mb-3" id="veiculo"  style="width: 100%" name="veiculo" required>
+            <option selected>Adicione o veiculo caso não exista!</option>
+            {% for veiculo in veiculos %}
+                <option value="{{veiculo.id_veiculos}}">{{veiculo.placa}}</option>
+            {% endfor %}
+          </select>
           <h6>Problema</h6>
-          <input type="text" class="form-control mb-3" name="defeito" id="defeito" required>
+          <textarea type="text" class="form-control mb-3" name="defeito" id="defeito" required></textarea>
           <h6>Data de Emissão</h6>
           <input type="date" class="form-control mb-3" name="dataEmissao" id="dataEmissao" required>
           <h6>Previsão de Entrega</h6>
           <input type="date" class="form-control mb-3" name="previsaoEntrega" id="previsaoEntrega" required>
-          <h6>Escolha o Cliente</h6>
-          <select class="form-select mb-3" name="cliente" aria-label="Default select example">
-            <option selected>Adicione o cliente caso ele não exista!</option>
-            {% for cliente in clientes %}
-              <option value="{{cliente.id_clientes}}">{{cliente.nome}}</option>
-            {% endfor %}
-          </select>
-          <h6>Escolha o Veículo</h6>
-          <select class="form-select mb-3" name="veiculo" aria-label="Default select example">
-            <option selected>Adicione o cliente caso ele não exista!</option>
-            {% for veiculo in veiculos %}
-              <option value="{{veiculo.id_veiculos}}">{{veiculo.placa}}</option>
-            {% endfor %}
-          </select>
-          <h6>Escolha o Serviço</h6>
-          <select class="form-select mb-3" name="servico" aria-label="Default select example">
-            <option selected>Adicione o serviço caso ele não exista!</option>
-            {% for servico in servicos %}
-            <option value="{{servico.id_servicos}}">{{servico.nome}}</option>
-            {% endfor %}
-          </select>
-          <h6>Escolha as Peças</h6>
-          <select class="form-select mb-3" name="peca" aria-label="Default select example">
-            <option selected>Adicione a peça caso ela não exista!</option>
-            {% for pecas in pecas %}
-            <option value="{{pecas.id_pecas}}">{{pecas.nome_da_peca}} - {{pecas.marca}}</option>
-            {% endfor %}
-          </select>
+          
           <h6>Escolha a Equipe</h6>
-          <select class="form-select mb-3" name="equipe" aria-label="Default select example">
+          <select id="equipe" class="form-select mb-3" style="width: 100%" name="equipe"  required>
             <option selected>Adicione uma equipe caso não exista!</option>
             {% for equipe in equipes %}
             <option value="{{equipe.id_equipes}}">{{equipe.nome}}</option>
             {% endfor %}
           </select>
-          <h6>Valor Total da Ordem</h6>
-          <input type="text" class="form-control mb-3" name="valor" id="valor" required>
-        </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-dark">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          <button type="submit" class="btn btn-dark">Salvar</button>
         </div>
       </form>
     </div>
@@ -196,6 +210,51 @@
           }
       });
   }
+
+  function mostrarInputServico(id){
+    let inputContainer = document.querySelector(`#inputServico${id}`);
+    if(inputContainer.style.display == 'none'){
+      inputContainer.style.display = "block";
+    }else{
+      inputContainer.style.display = "none"
+    }
+  }
+
+  function mostrarInputPecas(id){
+    let inputContainer = document.querySelector(`#inputPecas${id}`);
+    if(inputContainer.style.display == 'none'){
+      inputContainer.style.display = "block";
+      
+    }else{
+      inputContainer.style.display = "none"
+    }
+  }
+
+  function mostrarInputValor(id){
+    let inputContainer = document.querySelector(`#inputValor${id}`);
+    if(inputContainer.style.display == 'none'){
+      inputContainer.style.display = "block";
+    }else{
+      inputContainer.style.display = "none"
+    }
+  }
+  function mostrarFiltro(){
+    let filtro = document.querySelector(`.filtro`);
+    if(filtro.style.display == 'none'){
+      filtro.style.display = "block";
+    }else{
+      filtro.style.display = "none"
+    }
+    
+  }
+  $(document).ready(function() {
+    $("#veiculo").select2({
+      dropdownParent: $('#modal .modal-content')
+    });
+    $("#equipe").select2({
+      dropdownParent: $('#modal .modal-content')
+    });
+  });
 </script>
 
 {% endblock %}
